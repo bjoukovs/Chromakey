@@ -22,7 +22,7 @@ function varargout = GUI(varargin)
 
     % Edit the above text to modify the response to help GUI
 
-    % Last Modified by GUIDE v2.5 25-Apr-2018 15:39:42
+    % Last Modified by GUIDE v2.5 29-Apr-2018 23:30:08
 
     % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -42,6 +42,7 @@ function varargout = GUI(varargin)
         gui_mainfcn(gui_State, varargin{:});
     end
     % End initialization code - DO NOT EDIT
+    
 
 
 % --- Executes just before GUI is made visible.
@@ -88,15 +89,22 @@ function varargout = GUI_OutputFcn(hObject, eventdata, handles)
 
 % --- Executes on selection change in listbox1.
 function listbox1_Callback(hObject, eventdata, handles)
-    % hObject    handle to listbox1 (see GCBO)
-    % eventdata  reserved - to be defined in a future version of MATLAB
-    % handles    structure with handles and user data (see GUIDATA)
-
-    % Hints: contents = cellstr(get(hObject,'String')) returns listbox1 contents as cell array
-    %        contents{get(hObject,'Value')} returns selected item from listbox1
-
-
-    % --- Executes during object creation, after setting all properties.
+     %When the users selects a scribble in the list
+    global scribbles;
+    global scribble_n;
+    global background;
+    global main_image;
+    
+    if scribble_n~=0
+       num = get(handles.listbox1, 'Value');
+       scribble_n = num;
+       
+       updateScribbleInfo(handles);
+       
+       
+    end
+    
+    
     
 function listbox1_CreateFcn(hObject, eventdata, handles)
     % hObject    handle to listbox1 (see GCBO)
@@ -114,7 +122,27 @@ function listbox1_CreateFcn(hObject, eventdata, handles)
 
 % --- Executes on button press in pushbutton2.
 function pushbutton2_Callback(hObject, eventdata, handles)
-    disp("test");
+    %adds new scribble to list
+    global scribbles;
+    global main_image;
+    global scribble_n;
+    
+  
+    if ~isempty(main_image)
+        a = "Scribble "+string(length(scribbles)+1);
+        str_part = a;
+        old_str = get(handles.listbox1,'String');
+        new_string=strvcat(char(old_str),char(str_part));
+        
+        if scribble_n == 0
+           set(handles.listbox1,'Value',1); 
+        end
+        
+        set(handles.listbox1,'String',new_string);
+
+        createScribble(handles);
+        updateScribbleInfo(handles);
+    end
 
 
 
@@ -133,11 +161,6 @@ function pushbutton3_Callback(hObject, eventdata, handles)
     image_width = sz(2) %width
     image_height = sz(1) %height
     
-    global scribbles
-    global scribble_n
-    scribbles = {};
-    scribble_n = 1; %normally put 0
-    scribbles{1} = [0 0]; %normally remove this line
     
     %display the image
     axes(handles.axes1)
@@ -147,18 +170,50 @@ function pushbutton3_Callback(hObject, eventdata, handles)
 
 % --- Executes on button press in pushbutton4.
 function pushbutton4_Callback(hObject, eventdata, handles)
-    % hObject    handle to pushbutton4 (see GCBO)
-    % eventdata  reserved - to be defined in a future version of MATLAB
-    % handles    structure with handles and user data (see GUIDATA)
+    %Delete scribble
+    
+    global scribbles;
+    global scribble_n;
+    global background;
+    
+    if scribble_n ~= 0
+        
+        old_num = scribble_n;
+        
+        if length(scribbles)==1
+            set(handles.listbox1, 'Value', 0);
+            scribble_n=0;
+        else
+            set(handles.listbox1, 'Value', 1);
+            scribble_n=1;
+        end
+        
+        %remove from list
+        current_list = get(handles.listbox1,'String');
+        current_list = [current_list(1:old_num-1,:); current_list(old_num+1:end,:)];
+        set(handles.listbox1, 'String', current_list);
+        
+        background(old_num) = [];
+        scribbles(old_num) = [];
+        
+        updateScribbleInfo(handles);
+        updateImageAndScribbles(handles);
+        
+        
+    end
 
 
 % --- Executes on button press in checkbox1.
 function checkbox1_Callback(hObject, eventdata, handles)
-    % hObject    handle to checkbox1 (see GCBO)
-    % eventdata  reserved - to be defined in a future version of MATLAB
-    % handles    structure with handles and user data (see GUIDATA)
-
-    % Hint: get(hObject,'Value') returns toggle state of checkbox1
+    %When the users sets the current scribble as a background color
+    global scribbles;
+    global scribble_n;
+    global background;
+    
+    if scribble_n ~= 0
+       state = get(handles.checkbox1, 'Value');
+       background{scribble_n} = state;
+    end
 
 
 % --- Executes on button press in pushbutton5.
@@ -187,7 +242,11 @@ function axes1_CreateFcn(hObject, eventdata, handles)
 % IMAGE MOUSE DOWN ACTION
 function image_ButtonDownFcn(hObject, eventdata, handles)
     global mouseDown;
-    mouseDown = 1;
+    global scribble_n;
+    
+    if scribble_n ~= 0
+        mouseDown = 1;
+    end
     
     
     
@@ -252,8 +311,11 @@ function updateImageAndScribbles(handles)
     
     for i=1:length(scribbles)
         
-        for j=1:length(scribbles{i})
-            plot(scribbles{i}(j,1),scribbles{i}(j,2),'r.','MarkerSize',6);
+        sz = size(scribbles{i});
+        if sz(1)>1
+            for j=1:length(scribbles{i})
+                plot(scribbles{i}(j,1),scribbles{i}(j,2),'r.','MarkerSize',6);
+            end
         end
         
     end
@@ -268,26 +330,107 @@ function stopMouseMoving(handles)
     mouseDown = 0;
 
     %action when users stops drawing scribble 
-   disp('test');
-   RGB = getMeanColor(main_image,scribbles,scribble_n);
-   updateMeanColorDisplay(handles,RGB)
+   updateScribbleInfo(handles)
    
 function mn = getMeanColor(img,scribbles,scribble_n)
 
-    pixels = []
-    for i=2:length(scribbles{scribble_n})
-       pos = scribbles{scribble_n}(i,:); 
-       pixels = [pixels; img(pos(1),pos(2),:)]; 
+    pixels = [];
+    sz = size(scribbles{scribble_n});
+    if sz(1)>1
+        for i=2:length(scribbles{scribble_n})
+           pos = scribbles{scribble_n}(i,:); 
+           pixels = [pixels; img(pos(2),pos(1),:)]; 
+        end
     end
     
-    mnR = mean(pixels(:,1));
-    mnG = mean(pixels(:,2));
-    mnB = mean(pixels(:,3));
+    if ~isempty(pixels)
+        mnR = mean(pixels(:,1));
+        mnG = mean(pixels(:,2));
+        mnB = mean(pixels(:,3));
+
+        mn = [];
+        mn(1,1,:) = [mnR mnG mnB]
+    else
+        mn = []
+        mn(1,1,:) = [1 1 1];
+    end
     
-    mn = [];
-    mn(1,1,:) = [mnR mnG mnB]
     
+function updateScribbleInfo(handles)
+    %updates scribble display
+    global scribbles;
+    global scribble_n;
+    global background;
+    global main_image;
     
-function updateMeanColorDisplay(handles,RGB)
-    axes(handles.axes2);
-    imshow(RGB);
+    if scribble_n ~= 0
+        RGB = getMeanColor(main_image,scribbles,scribble_n);
+        axes(handles.axes2);
+        imshow(RGB);
+        
+        set(handles.checkbox1, 'Value', background{scribble_n});
+        name = cellstr(get(handles.listbox1,'String'));
+        name = name{scribble_n};
+        set(handles.edit1, 'String', name);
+        
+        set(handles.listbox1,'Value',scribble_n);
+    else
+       set(handles.edit1,'String',"");
+       set(handles.checkbox1,'Value',0);
+       axes(handles.axes2);
+       RBG = [];
+       RGB(1,1,:) = [1 1 1];
+        imshow(RGB);
+    end
+    
+function createScribble(handles)
+    global scribbles;
+    global scribble_n;
+    global background;
+    
+    num = length(scribbles)+1;
+    scribbles{num} = [0 0];
+    scribble_n = num;
+    
+    background{scribble_n} = 0;
+    
+
+
+
+function edit1_Callback(hObject, eventdata, handles)
+% hObject    handle to edit1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit1 as text
+%        str2double(get(hObject,'String')) returns contents of edit1 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit1_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in pushbutton7.
+function pushbutton7_Callback(hObject, eventdata, handles)
+    %Renames scribble
+    global scribbles;
+    global scribble_n;
+    
+    if scribble_n ~= 0
+       name = get(handles.edit1, 'String') ;
+       if ~strcmp(name,"")
+          current_list = cellstr(get(handles.listbox1,'String')); %transform to cell array
+          current_list{scribble_n} = char(name);
+          current_list = char(current_list); %back to char array
+          set(handles.listbox1, 'String', current_list);
+       end
+    end
