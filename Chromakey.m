@@ -7,10 +7,12 @@ global image_width;
 global image_height;
 global scribbles;
 global scribble_n;
+global background;
 
 mouseDown = 0;
-scribble_n = 1;
-scribbles{1} = [0 0];
+scribble_n = 0;
+scribbles = {};
+background = {};
 
 gui = GUI();
 
