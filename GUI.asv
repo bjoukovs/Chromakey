@@ -70,7 +70,7 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     global cp;
     options = 0;  icon = 0;
     cp = com.mathworks.mlwidgets.graphics.ColorPicker(options,icon,'');
-    [jcp,hContainer] = javacomponent(cp,[35,260,50,25],gcf);
+    [jColorPicker,hContainer] = javacomponent(cp,[10,20,30,20],gcf);
      set(jcp, 'ItemStateChangedCallback', {@MyCallback,gcf})
     
 function clearAxes(axs)
@@ -233,19 +233,9 @@ function pushbutton5_Callback(hObject, eventdata, handles)
 
 % --- Executes on button press in pushbutton6.
 function pushbutton6_Callback(hObject, eventdata, handles)
-     global main_image;
-    global scribbles;
-    global scribble_n;
-    global custom_color;
-    
-    if scribble_n ~= 0
-        RGB = getMeanColor(main_image,scribbles,scribble_n);
-        custom_color{scribble_n} = RGB;
-    end
-    
-
-    %action when users stops drawing scribble 
-   updateScribbleInfo(handles)
+    % hObject    handle to pushbutton6 (see GCBO)
+    % eventdata  reserved - to be defined in a future version of MATLAB
+    % handles    structure with handles and user data (see GUIDATA)
 
 
  
@@ -292,7 +282,6 @@ function figure1_WindowButtonMotionFcn(hObject, eventdata, handles)
     global scribble_n;
     global scribbles;
     global main_image;
-    global custom_color;
 
     if mouseDown == 1
         axes(handles.axes1);
@@ -319,9 +308,6 @@ function figure1_WindowButtonMotionFcn(hObject, eventdata, handles)
                 hold on;
                 plot(mx,my,'r.','MarkerSize',6);
                 hold off;
-                
-                RGB = getMeanColor(main_image,scribbles,scribble_n);
-                custom_color{scribble_n} = RGB;
                 
             end
             
@@ -364,10 +350,10 @@ function stopMouseMoving(handles)
     global scribbles;
     global scribble_n;
     global mouseDown;
-    global custom_color;
     
     mouseDown = 0;
     
+    RGB = getMeanColor(main_image,scri);
 
     %action when users stops drawing scribble 
    updateScribbleInfo(handles)

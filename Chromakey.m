@@ -8,6 +8,7 @@ global image_height;
 global scribbles;
 global scribble_n;
 global background;
+global custom_color;
 
 mouseDown = 0;
 scribble_n = 0;
