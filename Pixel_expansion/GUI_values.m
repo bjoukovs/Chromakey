@@ -1,3 +1,6 @@
+% TO OBTAIN THE VALUES FROM GUI: put a breakpoint just after the call to GUI,
+% make the scribbles in GUI, close GUI and then run the rest of the program
+
 clear all;
 close all;
 clc;
@@ -20,4 +23,6 @@ background = {};
 
 gui = GUI(); %obtain scribbles from the GUI
 
-save('values_GUI.mat')
+% save('main_colors.mat',custom_color);
+% save('scribble_pos.mat',scribbles);
+save('values_GUI.mat');
