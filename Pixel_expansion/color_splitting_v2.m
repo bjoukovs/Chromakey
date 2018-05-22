@@ -1,18 +1,74 @@
 %% Initialization
 clear all; close all;clc;
-im=im2double(imread('test.png'));
-%figure;imshow(im)
+im=im2double(imread('test5.jpg'));
+figure;imshow(im)
 x0=1016;y0=1138;
 [row,col,~] = size(im);
-NBRE_REF=3;
-ref_col=zeros(NBRE_REF,3);
 
-ref_col(1,:) = [0.7765 0.1294 0.4235];
-ref_col(2,:) = [0.6784 0.4078 0.2];
-ref_col(3,:) = [1 1 1];
 
-eps=1400; %way bigger than the epsilon of color_splitting_v1
+%%%%%% TEST.PNG %%%%%%%%%%%%%%%%%%%%%%%%%%
+% NBRE_REF=3;
+% ref_col=zeros(NBRE_REF,3);
+% ref_col(1,:) = [0.7765 0.1294 0.4235];
+% ref_col(2,:) = [0.6784 0.4078 0.2];
+% ref_col(3,:) = [1 1 1];
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%% TEST2.PNG %%%%%%%%%%%%%%%%%%%%%%%%%%
+% NBRE_REF=5;
+% ref_col=zeros(NBRE_REF,3);
+% ref_col(1,:) = [0.8 0.1059 0.1333];
+% ref_col(2,:) = [0 0.302 0.5137];
+% ref_col(3,:) = [0.8588 0.7137 0.6275];
+% ref_col(4,:) = [0.5843 0.5176 0.3216];
+% ref_col(5,:) = [1 1 1];
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%% TEST3.jpg %%%%%%%%%%%%%%%%%%%%%
+% NBRE_REF=4;
+% ref_col=zeros(NBRE_REF,3); %3 for 3 colors
+% ref_col(1,:)=[0 1 0];
+% ref_col(2,:)=[0.7216 0.5333 0.4431];
+% ref_col(3,:)=[0.6549 0.09804 0.04314];
+% ref_col(4,:)=[0.8941 0.3333 0.502];
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%% TEST4.jpg %%%%%%%%%%%%%%%%%%%%
+% NBRE_REF=6;
+% ref_col=zeros(NBRE_REF,3); %3 for 3 colors
+% ref_col(1,:)=[0 0.6549 0.149]; %green background
+% ref_col(2,:)=[0.2039 0.2902 0.3412]; %jeans
+% ref_col(3,:)=[0.09804 0.1451 0.1451]; %pull
+% ref_col(4,:)=[0.9255 0.8 0.749]; %skin
+% ref_col(5,:)=[0.251 0.1882 0.1255]; %hair
+% ref_col(6,:)=[0.2549 0.2275 0.1255]; %balai
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%% TEST5.jpg %%%%%%%%%%%%%%%%%%%%
+NBRE_REF=5;
+ref_col=zeros(NBRE_REF,3); %3 for 3 colors
+ref_col(1,:)=[0.1569 0.5098 0.1647]; %green background
+ref_col(2,:)=[0.4078 0.4275 0.4392]; %jeans
+ref_col(3,:)=[0.9804 0.9059 0.7804]; %t-shirt
+ref_col(4,:)=[0.9882 0.7373 0.4941]; %skin
+ref_col(5,:)=[0.09412 0.09804 0.06667]; %hair
+% ref_col(6,:)=[1 0.8627 0.5569]; %sable
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%% For TEST2.PNG %%%%%%%%
+% eps=1400; %way bigger than the epsilon of color_splitting_v1
+% eps_mat=eps*ones(row,col);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%% For TEST3.JPG %%%%%%%%
+% eps=400; %way bigger than the epsilon of color_splitting_v1
+% eps_mat=eps*ones(row,col);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%% For TEST4.JPG %%%%%%%%
+eps=500; %way bigger than the epsilon of color_splitting_v1
 eps_mat=eps*ones(row,col);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 
 ref_col_lab=rgb2lab(ref_col);
 im_lab=rgb2lab(im);
