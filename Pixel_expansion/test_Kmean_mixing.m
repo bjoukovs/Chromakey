@@ -1,11 +1,17 @@
 clear; close all;clc;
 
+SPILLING_COEFF = 2; %The higher, the less the spilling is removed
+
 
 %% Image conversion to L*a*b*
 he = imread('test3.jpg');
 figure;
 imshow(he), title('H&E image');
 lab_he = rgb2lab(he);
+
+ab = lab_he(:,:,2:3); %keep the a and b component of Lab space
+nrows = size(ab,1);
+ncols = size(ab,2);
 
 
 
@@ -14,6 +20,11 @@ lab_he = rgb2lab(he);
 load('ScribbleTest.mat')
 
 he_double = im2double(he);
+
+he_YUV = rgb2yuv(he_double);
+
+
+%he_YUV = rgb2ycbcr(he_double); %YUV conversion
 
 
 for i=1:length(scribbles)
@@ -25,10 +36,10 @@ for i=1:length(scribbles)
     pixels = [];
     
     for j=1:n
-       pixels = [pixels he_double(positions(j,1),positions(j,2),:)] 
+       pixels = [pixels he_YUV(positions(j,1),positions(j,2),:)] 
     end
     
-    scribble_means(i,1,:) = [mean(mean(pixels(:,:,1))) mean(mean(pixels(:,:,2))) mean(mean(pixels(:,:,3)))];
+    scribble_means(i,1,:) = [mean(pixels(:,:,1)) mean(pixels(:,:,2)) mean(pixels(:,:,3))];
     scribble_vars(i,1,:) = [std(pixels(:,:,1)) std(pixels(:,:,2)) std(pixels(:,:,2))]
     
 end
@@ -36,9 +47,6 @@ end
 
 
 %% K-means clustering
-ab = lab_he(:,:,2:3); %keep the a and b component of Lab space
-nrows = size(ab,1);
-ncols = size(ab,2);
 ab = reshape(ab,nrows*ncols,2); %transforme en un vecteur colonne à 2 colonnes: une matrice nrows*ncol x 2
 %reshape column wise: put each column of the matrix below the previous one,
 %and each element contains 2 components (a and b), here they are put one
@@ -77,7 +85,7 @@ end
 
 load('good_regions.mat')
 
-vec_image = reshape(he_double, [], 1, size(he_double,3));
+vec_image = reshape(he_YUV, [], 1, size(he_double,3));
 
 
 for i=1:nColors
@@ -99,18 +107,28 @@ for x=1:ncols
       
        index = pixel_labels(y,x);
        
-       %he_double(y,x,:) = original_means(index,1,:) + original_vars(index, 1, :) .* ((he_double(y,x,:) - original_means(index, 1, :) ./ original_vars(index, 1, :)));
-       he_double(y,x,:) = scribble_means(index,1,:) + (he_double(y,x,2) - original_means(index, 1, 2));
+       %he_double(y,x,:) = scribble_means(index,1,:) + scribble_vars(index, 1, :) .* ((he_double(y,x,:) - original_means(index, 1, :) ./ original_vars(index, 1, :)));
+       %he_double(y,x,:) = scribble_means(index,1,:) + (he_double(y,x,2) - original_means(index, 1, 2));
+       
+       he_YUV2(y,x,:) = scribble_means(index,1,:) + SPILLING_COEFF*scribble_vars(index, 1, :) .* ...
+           ((he_YUV(y,x,:) - original_means(index, 1, :))./ original_vars(index, 1, :));
+       %he_YUV(y,x,2:3) = scribble_means(index,1,2:3) + 0.1*(he_YUV(y,x,2:3) - original_means(index, 1, 2:3));
        
        if index == 1
-          he_double(y,x,:) = [0 0 0]; 
+          he_YUV2(y,x,:) = [0 0 0]; %black in YUV
+          he_YUV(y,x,:) = [0 0 0]; %black in YUV
        end
        
    end
 end
 
+he_keyed = yuv2rgb(he_YUV2);
+he_original = yuv2rgb(he_YUV);
+
 figure
-imshow(he_double)
+imshow(he_keyed);
+figure
+imshow(he_original);
 
 %% TO DO
 % - to refine: perform a K-means on one of the "filtered" image: par ex sur
