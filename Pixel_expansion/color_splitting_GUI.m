@@ -15,10 +15,10 @@ figure;imshow(im)
 %var_scrib=zeros(1,b);
 
 means=cell(1,b); %will contain the mean_scrib
-vars=cell(1,b); %will contain the mean_scrib
+vars=cell(1,b); %will contain the var_scrib
 
 for k=1:b
-    pos=scribbles{1,k};
+    pos=scribbles{k};
     [c,d]=size(pos);
     temp=zeros(c-1,2);
     temp(:,1)=pos(2:end,1);
@@ -27,7 +27,7 @@ for k=1:b
     [c,d]=size(pos);
     col_points=zeros(c,1,3);
     for i=1:c
-        col_points(i,1,:)=im(pos(i,1),pos(i,2),:);
+        col_points(i,1,:)=im(pos(i,2),pos(i,1),:);
     end
     %mean_scrib(1,k)=mean(col_points,3); 
     mean_scrib=zeros(3,1);
