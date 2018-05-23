@@ -5,17 +5,20 @@ load('values_GUI.mat')
 % WARNING first obtain 'values_GUI.mat' from the script GUI_values.m
 
 im=im2double(imread('test.png'));
-figure;imshow(im)
+%figure;imshow(im)
 [row,col,~] = size(im);
 
-%im=rgb2gray(im);
-
 [a,b]=size(scribbles);
-%mean_scrib=zeros(1,b);
-%var_scrib=zeros(1,b);
 
 means=cell(1,b); %will contain the mean_scrib
 vars=cell(1,b); %will contain the var_scrib
+
+%im_lab=rgb2lab(im);
+%imshow(im_lab)
+% custom_color_lab=custom_color;
+% for p=1:length(custom_color)
+%     custom_color_lab{1,p}=rgb2lab(custom_color{1,p})
+% end
 
 for k=1:b
     pos=scribbles{k};
@@ -43,6 +46,34 @@ for k=1:b
     var_scrib=cov(col_point_for_var);
     vars{1,k}=var_scrib;
 end
+
+%% 
+
+NBRE_REF = b; %number of elements in scribbles
+im_para = zeros(row,col,3);
+eps = 0.001; %to tune
+temp=zeros(1,3);
+dist_mahal=zeros(row,col,NBRE_REF);
+for i = 1:row
+    i
+    for j = 1:col
+        eps_perso=eps;
+        for k = 1:NBRE_REF
+            temp(1,1)=im(i,j,1);
+            temp(1,2)=im(i,j,2);
+            temp(1,3)=im(i,j,3);
+            dist_mahal = (temp'-means{1,k})'*vars{1,k}*(temp'-means{1,k});
+            if dist_mahal < eps
+                if dist_mahal < eps_perso
+                    eps_perso = dist_mahal;
+                    im_para(i,j,:) = custom_color{1,k}';%ref_col(k,:);
+                end
+            end
+            dist_mahal(i,j,k)=dist_mahal;
+        end   
+    end
+end
+figure;imshow(im_para)
 
 
 
