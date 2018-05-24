@@ -23,7 +23,7 @@ function varargout = GUI(varargin)
 
     % Edit the above text to modify the response to help GUI
 
-    % Last Modified by GUIDE v2.5 29-Apr-2018 23:30:08
+    % Last Modified by GUIDE v2.5 24-May-2018 11:55:42
 
     % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -72,6 +72,7 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     cp = com.mathworks.mlwidgets.graphics.ColorPicker(options,icon,'');
     [jcp,hContainer] = javacomponent(cp,[35,260,50,25],gcf);
      set(jcp, 'ItemStateChangedCallback', {@MyCallback,gcf})
+     
     
 function clearAxes(axs)
     axes(axs);
@@ -135,7 +136,7 @@ function pushbutton2_Callback(hObject, eventdata, handles)
     
   
     if ~isempty(main_image)
-        a = 'Scribble '+string(length(scribbles)+1);
+        a = "Scribble "+string(length(scribbles)+1);
         str_part = a;
         old_str = get(handles.listbox1,'String');
         new_string=strvcat(char(old_str),char(str_part));
@@ -418,7 +419,7 @@ function updateScribbleInfo(handles)
         
         set(handles.listbox1,'Value',scribble_n);
     else
-       set(handles.edit1,'String','');
+       set(handles.edit1,'String',"");
        set(handles.checkbox1,'Value',0);
        
        set(cp,'Value',java.awt.Color(1,1,1));
@@ -470,10 +471,84 @@ function pushbutton7_Callback(hObject, eventdata, handles)
     
     if scribble_n ~= 0
        name = get(handles.edit1, 'String') ;
-       if ~strcmp(name,'')
+       if ~strcmp(name,"")
           current_list = cellstr(get(handles.listbox1,'String')); %transform to cell array
           current_list{scribble_n} = char(name);
           current_list = char(current_list); %back to char array
           set(handles.listbox1, 'String', current_list);
        end
     end
+
+
+% --- Executes on button press in pushbutton8.
+function pushbutton8_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton8 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on slider movement.
+function spillingSlider_Callback(hObject, eventdata, handles)
+% hObject    handle to spillingSlider (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+
+% --- Executes during object creation, after setting all properties.
+function spillingSlider_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to spillingSlider (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+% --- Executes on slider movement.
+function slider3_Callback(hObject, eventdata, handles)
+% hObject    handle to slider3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+
+% --- Executes during object creation, after setting all properties.
+function slider3_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to slider3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+% --- Executes on selection change in popupmenu1.
+function popupmenu1_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenu1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu1 contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenu1
+
+
+% --- Executes during object creation, after setting all properties.
+function popupmenu1_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenu1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
