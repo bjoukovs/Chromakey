@@ -34,8 +34,8 @@ function output = UnMixing(image_double,spillingCoefficient,nb_classes,class_mat
         original_var_matrix(positions,1,:) = ones(length(positions),1,3).*original_vars(i, 1,:);
         
         if backgrounds{1,i} == 1
-            scribble_mean_matrix(positions,1,:) = [0 0 0];
-            scribble_var_matrix(positions,1,:) = [0 0 0];
+            scribble_mean_matrix(positions,1,:) = zeros(length(positions),1,3);
+            scribble_var_matrix(positions,1,:) = zeros(length(positions),1,3);
         else
             if corrections==1
                 scribble_mean_matrix(positions,1,:) = lumCor + ones(length(positions),1,3).*scribble_means(i, 1,:);
