@@ -1,4 +1,9 @@
-function output = UnMixing(rows,cols,image_YUV,image_double,spillingCoefficient,nb_classes,class_matrix,scribble_means,scribble_vars)
+function output = UnMixing(image_double,spillingCoefficient,nb_classes,class_matrix,scribble_means,scribble_vars,backgrounds, luminanceCorrection)
+
+
+    [rows,cols, ~] = size(image_double);
+    
+    image_YUV = rgb2yuv(image_double);
 
     %% VAR AND MEAN OF THE TRUE 
     vec_image = reshape(image_YUV, [], 1, size(image_double,3));
@@ -12,16 +17,23 @@ function output = UnMixing(rows,cols,image_YUV,image_double,spillingCoefficient,
     end
 
     %% Pixel transformation
+    lumCor = zeros(1,1,3);
+    lumCor(1,1,1) = luminanceCorrection;
+    
     for x=1:cols
-       for y=1:rows      
+       for y=1:rows
+           
            index = class_matrix(y,x);
-           image_YUV2(y,x,:) = scribble_means(index,1,:) + spillingCoefficient*scribble_vars(index, 1, :) .* ...
-               ((image_YUV(y,x,:) - original_means(index, 1, :))./ original_vars(index, 1, :));
-
-           if index == 1
+            
+           %Background color should be plotted black
+           if backgrounds{1,index} == 1
               image_YUV2(y,x,:) = [0 0 0]; %black in YUV
               image_YUV(y,x,:) = [0 0 0]; %black in YUV
-           end       
+           else
+               
+                image_YUV2(y,x,:) = lumCor + scribble_means(index,1,:) + spillingCoefficient*scribble_vars(index, 1, :) .* ...
+               ((image_YUV(y,x,:) - original_means(index, 1, :))./ original_vars(index, 1, :));
+           end
        end
     end
 

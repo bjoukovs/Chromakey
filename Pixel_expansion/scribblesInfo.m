@@ -12,7 +12,7 @@ function [custom_color_AB, image_YUV,image_double,scribble_means,scribble_vars] 
 
     for p=1:nb_classes
         custom_color_lab = rgb2lab(custom_color{1,p});
-        custom_color_AB(p,:) = custom_color_lab(2:3)
+        custom_color_AB(p,:) = custom_color_lab(2:3);
     end
 
     %Extracting mean and variance in YUV space (to remove green spilling after K-means)
@@ -25,9 +25,9 @@ function [custom_color_AB, image_YUV,image_double,scribble_means,scribble_vars] 
         positions = [scribbles{i}(2:end,2) scribbles{i}(2:end,1)];
         pixels = [];    
         for j=1:n
-           pixels = [pixels image_YUV(positions(j,1),positions(j,2),:)] 
+           pixels = [pixels image_YUV(positions(j,1),positions(j,2),:)] ;
         end
         scribble_means(i,1,:) = [mean(pixels(:,:,1)) mean(pixels(:,:,2)) mean(pixels(:,:,3))];
-        scribble_vars(i,1,:) = [std(pixels(:,:,1)) std(pixels(:,:,2)) std(pixels(:,:,2))]
+        scribble_vars(i,1,:) = [std(pixels(:,:,1)) std(pixels(:,:,2)) std(pixels(:,:,2))];
     end
 end

@@ -23,7 +23,7 @@ function varargout = GUI(varargin)
 
     % Edit the above text to modify the response to help GUI
 
-    % Last Modified by GUIDE v2.5 24-May-2018 11:55:42
+    % Last Modified by GUIDE v2.5 24-May-2018 23:04:10
 
     % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -73,14 +73,6 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     [jcp,hContainer] = javacomponent(cp,[35,260,50,25],gcf);
      set(jcp, 'ItemStateChangedCallback', {@MyCallback,gcf})
      
-    
-function clearAxes(axs)
-    axes(axs);
-    axis off;
-    set(gca,'xtick',[])
-    set(gca,'xticklabel',[])
-    set(gca,'ytick',[])
-    set(gca,'yticklabel',[])
 
 
 % --- Outputs from this function are returned to the command line.
@@ -338,27 +330,7 @@ function figure1_WindowButtonUpFcn(hObject, eventdata, handles)
     end
     
     
-function updateImageAndScribbles(handles)
-    global main_image
-    global scribbles
-    
-    clearAxes(handles.axes1);
-    axes(handles.axes1);
-    img = imshow(main_image, 'parent', handles.axes1);
-    set(img,'ButtonDownFcn',@image_ButtonDownFcn);
-    hold on;
-    
-    for i=1:length(scribbles)
-        
-        sz = size(scribbles{i});
-        if sz(1)>1
-            for j=1:length(scribbles{i})
-                plot(scribbles{i}(j,1),scribbles{i}(j,2),'r.','MarkerSize',6);
-            end
-        end
-        
-    end
-    hold off;
+
     
 function stopMouseMoving(handles)
     global main_image;
@@ -372,71 +344,6 @@ function stopMouseMoving(handles)
 
     %action when users stops drawing scribble 
    updateScribbleInfo(handles)
-   
-function mn = getMeanColor(img,scribbles,scribble_n)
-
-    pixels = [];
-    sz = size(scribbles{scribble_n});
-    if sz(1)>1
-        for i=2:length(scribbles{scribble_n})
-           pos = scribbles{scribble_n}(i,:); 
-           pixels = [pixels; img(pos(2),pos(1),:)]; 
-        end
-    end
-    
-    if ~isempty(pixels)
-        mnR = mean(pixels(:,1));
-        mnG = mean(pixels(:,2));
-        mnB = mean(pixels(:,3));
-
-        mn = [];
-        mn(1,1,:) = [mnR mnG mnB]
-    else
-        mn = []
-        mn(1,1,:) = [1 1 1];
-    end
-    
-    
-function updateScribbleInfo(handles)
-    %updates scribble display
-    global scribbles;
-    global scribble_n;
-    global background;
-    global main_image;
-    global custom_color;
-    global cp;
-    
-    if scribble_n ~= 0
-        RGB = custom_color{scribble_n};
-        col = java.awt.Color(RGB(1),RGB(2),RGB(3));
-        set(cp,'Value',col);
-        
-        set(handles.checkbox1, 'Value', background{scribble_n});
-        name = cellstr(get(handles.listbox1,'String'));
-        name = name{scribble_n};
-        set(handles.edit1, 'String', name);
-        
-        
-        set(handles.listbox1,'Value',scribble_n);
-    else
-       set(handles.edit1,'String',"");
-       set(handles.checkbox1,'Value',0);
-       
-       set(cp,'Value',java.awt.Color(1,1,1));
-    end
-    
-function createScribble(handles)
-    global scribbles;
-    global scribble_n;
-    global background;
-    global custom_color;
-    
-    num = length(scribbles)+1;
-    scribbles{num} = [0 0];
-    scribble_n = num;
-    
-    background{scribble_n} = 0;
-    custom_color{scribble_n} = [1 1 1];
     
 
 
@@ -482,73 +389,104 @@ function pushbutton7_Callback(hObject, eventdata, handles)
 
 % --- Executes on button press in pushbutton8.
 function pushbutton8_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton8 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+    % hObject    handle to pushbutton8 (see GCBO)
+    % eventdata  reserved - to be defined in a future version of MATLAB
+    % handles    structure with handles and user data (see GUIDATA)
 
 
 % --- Executes on slider movement.
 function spillingSlider_Callback(hObject, eventdata, handles)
-% hObject    handle to spillingSlider (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+   global availableResult
+   
+   if availableResult ~= 0
+      showUnmixedImage(handles); 
+   end
 
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 
-
-% --- Executes during object creation, after setting all properties.
+    % --- Executes during object creation, after setting all properties.
 function spillingSlider_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to spillingSlider (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
+    % hObject    handle to spillingSlider (see GCBO)
+    % eventdata  reserved - to be defined in a future version of MATLAB
+    % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: slider controls usually have a light gray background.
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
-end
-
-
-% --- Executes on slider movement.
-function slider3_Callback(hObject, eventdata, handles)
-% hObject    handle to slider3 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+    % Hint: slider controls usually have a light gray background.
+    if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor',[.9 .9 .9]);
+    end
 
 
-% --- Executes during object creation, after setting all properties.
-function slider3_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to slider3 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
+    % --- Executes on slider movement.
+function lumSlider_Callback(hObject, eventdata, handles)
+    global availableResult
+   
+   if availableResult ~= 0
+      showUnmixedImage(handles); 
+   end
+    
+    
+function lumSlider_CreateFcn(hObject, eventdata, handles)
+    % hObject    handle to lumSlider (see GCBO)
+    % eventdata  reserved - to be defined in a future version of MATLAB
+    % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: slider controls usually have a light gray background.
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
-end
+    % Hint: slider controls usually have a light gray background.
+    if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor',[.9 .9 .9]);
+    end
 
 
 % --- Executes on selection change in popupmenu1.
 function popupmenu1_Callback(hObject, eventdata, handles)
-% hObject    handle to popupmenu1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+    % hObject    handle to popupmenu1 (see GCBO)
+    % eventdata  reserved - to be defined in a future version of MATLAB
+    % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu1 contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from popupmenu1
+    % Hints: contents = cellstr(get(hObject,'String')) returns popupmenu1 contents as cell array
+    %        contents{get(hObject,'Value')} returns selected item from popupmenu1
 
 
 % --- Executes during object creation, after setting all properties.
 function popupmenu1_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to popupmenu1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
+    % hObject    handle to popupmenu1 (see GCBO)
+    % eventdata  reserved - to be defined in a future version of MATLAB
+    % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+    % Hint: popupmenu controls usually have a white background on Windows.
+    %       See ISPC and COMPUTER.
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+
+
+% --- Executes on button press in ResultButton.
+function ResultButton_Callback(hObject, eventdata, handles)
+    % hObject    handle to ResultButton (see GCBO)
+    % eventdata  reserved - to be defined in a future version of MATLAB
+    % handles    structure with handles and user data (see GUIDATA)
+    global main_image;
+    global custom_color;
+    global scribble_n;
+    global scribbles;
+    global availableResult;
+    
+    global scribble_means;
+    global scribble_vars;
+    global class_matrix;
+    
+    if scribble_n ~= 0
+        
+        %Getting scribble informations
+        [custom_color_AB, image_YUV,image_double,scribble_means,scribble_vars] = scribblesInfo(main_image,scribbles,custom_color);
+        
+        % Compute image segments
+        [segmented_images,class_matrix] = Segmentation_Kmeans(main_image,scribbles,custom_color_AB,length(custom_color));
+        
+        %An output image is now available
+        availableResult = 1;
+        
+        showUnmixedImage(handles);
+
+    end
+    
+    
+    

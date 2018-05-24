@@ -1,20 +1,19 @@
 clear all;
 close all;
 
+addpath('Pixel_expansion');
+addpath('GUI');
+
 global mouseDown;
-global main_image;
-global image_width;
-global image_height;
 global scribbles;
 global scribble_n;
 global background;
-global custom_color;
+global availableResult;
 
 mouseDown = 0;
 scribble_n = 0;
 scribbles = {};
 background = {};
+availableResult = 0;
 
 gui = GUI();
-
-

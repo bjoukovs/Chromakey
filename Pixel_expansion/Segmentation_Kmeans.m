@@ -1,5 +1,6 @@
-function [segmented_images,class_matrix] = Segmentation_Kmeans(image,rows,cols,custom_color_AB,nb_classes)
-
+function [segmented_images,class_matrix] = Segmentation_Kmeans(image,scribbles,custom_color_AB,nb_classes)
+    
+    [rows,cols, ~] = size(image);
 
     %% Conversion to LAB space
     %Transform the RGB image into a new kind of color space, the LAB one, where
@@ -17,10 +18,6 @@ function [segmented_images,class_matrix] = Segmentation_Kmeans(image,rows,cols,c
     %reshape column wise: put each column of the matrix below the previous one,
     %and each element contains 2 components (a and b), here they are put one
     %aside each other (that is why there are 2 columns in the matrix)
-
-    %Specify the number of cathegories that we want (number on differents
-    %zones/centroïdes/classes used in the algorithm
-    nb_classes = nb_classes;
 
     %A very important thing is to avoid begining with centroid in local minima
     %(his is due to the randomness initialization...) because in this case the
@@ -43,7 +40,7 @@ function [segmented_images,class_matrix] = Segmentation_Kmeans(image,rows,cols,c
     %reput in matricial form
     class_matrix = reshape(class_column,rows,cols);
     %plot the categories as grey levels
-    imshow(class_matrix,[]), title('Image segmented with a gray level for each of the classes');
+    %imshow(class_matrix,[]), title('Image segmented with a gray level for each of the classes');
 
     %% Attribute colors from the true image to the categories
     segmented_images = cell(1,nb_classes);
