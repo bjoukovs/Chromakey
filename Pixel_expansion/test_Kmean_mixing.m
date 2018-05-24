@@ -1,7 +1,6 @@
 clear; close all;clc;
 
-SPILLING_COEFF = 2; %The higher, the less the spilling is removed
-
+SPILLING_COEFF = 1.5; %The higher, the less the spilling is removed
 
 %% Image conversion to L*a*b*
 he = imread('test3.jpg');
@@ -10,22 +9,31 @@ imshow(he), title('H&E image');
 lab_he = rgb2lab(he);
 
 ab = lab_he(:,:,2:3); %keep the a and b component of Lab space
-nrows = size(ab,1);
-ncols = size(ab,2);
 
-
+rows = size(ab,1);
+cols = size(ab,2);
 
 %% Get scribble info
+%load('ScribbleTest.mat')
+load('values_GUI.mat');
 
-load('ScribbleTest.mat')
+%% Take centroids of the scribbles, warning: centroids are in color space not in geometrical space
+% so the centroids that we need are centroid in the lab space for the
+% kmeans clustering: we will tell the kmeans to begin with the centroids of
+% the scribbles
+[a,b]=size(scribbles); %b=nbre class = nbre of custom colors
+custom_color_AB = zeros(b,2); %contains the CENTROIDS of the scribbles, computation was done in the GUI
+for p=1:b
+    custom_color_lab = rgb2lab(custom_color{1,p});
+    custom_color_AB(p,:) = custom_color_lab(2:3)
+end
 
+%% Extracting mean and variance in YUV space (to remove green spilling after K-means)
 he_double = im2double(he);
 
 he_YUV = rgb2yuv(he_double);
 
-
 %he_YUV = rgb2ycbcr(he_double); %YUV conversion
-
 
 for i=1:length(scribbles)
     
@@ -45,22 +53,25 @@ for i=1:length(scribbles)
 end
 
 
-
 %% K-means clustering
-ab = reshape(ab,nrows*ncols,2); %transforme en un vecteur colonne à 2 colonnes: une matrice nrows*ncol x 2
+ab = reshape(ab,rows*cols,2); %transforme en un vecteur colonne à 2 colonnes: une matrice nrows*ncol x 2
 %reshape column wise: put each column of the matrix below the previous one,
 %and each element contains 2 components (a and b), here they are put one
 %aside each other (that is why there are 2 columns in the matrix)
 
-nColors = 3; %nbre of classes
+nColors = b; %nbre of classes, b comes from the size of the scribbles cell
+
+
 % re-iterate the whole k-means process NBRE_REPEAT times to avoid local
 % minima because the beginning of k-means is random initialization of
 % centroids so due to this randomness we have to repeat the process
 NBRE_REPEAT = 3;
-[cluster_idx, cluster_center] = kmeans(ab,nColors,'distance','sqEuclidean','Replicates',NBRE_REPEAT);
+centroid_kmeans=repmat(custom_color_AB,1,1,NBRE_REPEAT); %the third dimension of the centroid array must match the 'replicates' parameter value.
+[cluster_idx, cluster_center] = kmeans(ab,nColors,'distance','sqEuclidean','Replicates',NBRE_REPEAT,'Start',centroid_kmeans);
 % for each pixel, kmeans gives the index of the category to which it belongs
+
 %% Reput in matricial form                                 
-pixel_labels = reshape(cluster_idx,nrows,ncols); %reput in matricial form
+pixel_labels = reshape(cluster_idx,rows,cols); %reput in matricial form
 %imshow(pixel_labels,[]), title('image labeled by cluster index'); %plot the categories as grey levels
 
 %% Attribute colors from scribbles
@@ -76,17 +87,16 @@ for k = 1:nColors %go on the categories
                                %tested in the loop. The test is performed
                                %on the 3 channels (R,G,B) at the same time 
     segmented_images{k} = color; %there is only the color of the category remaining
-    %figure;
-    %imshow(segmented_images{k}); %plots the different categories
+    figure;
+    imshow(segmented_images{k}); %plots the different categories
 end
 
 
 %% VAR AND MEAN OF THE TRUE 
 
-load('good_regions.mat')
+%load('good_regions.mat')
 
 vec_image = reshape(he_YUV, [], 1, size(he_double,3));
-
 
 for i=1:nColors
     
@@ -98,12 +108,10 @@ for i=1:nColors
     
 end
 
-
-
 %% Pixel transformation
 
-for x=1:ncols
-   for y=1:nrows
+for x=1:cols
+   for y=1:rows
       
        index = pixel_labels(y,x);
        
@@ -134,5 +142,5 @@ imshow(he_original);
 % - to refine: perform a K-means on one of the "filtered" image: par ex sur
 % test3.jpg les ongles et la barre en plastique sont mis dans la meme
 % categorie, donc on pourrait faire k-means sur cette categories après
-% - put the starting centroids of k-means by user interaction with the GUI
+% - put the starting centroids of k-means by user interaction with the GUI: DONE
 % - 

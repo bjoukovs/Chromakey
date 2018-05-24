@@ -39,8 +39,15 @@ nb_rep = 3;    %Chosen arbitrarly
 %Otput: a columns matrix (rows*colsx1) and for each element we have the
 %class to which belong the pixel AND the position of the different
 %centroide (not used).
+
+% x1 = 1:1:cols;
+% x2 = 1:1:rows;
+% [x1G,x2G] = meshgrid(x1,x2);
+% XGrid = [x1G(:),x2G(:)]; % Defines a fine grid on the plot
+
 [class_column, class_center] = kmeans(im_AB_col,nb_classes,'distance','sqEuclidean','Replicates',nb_rep);
 
+class_centroid=[class_center(:,2)+floor(cols/2) class_center(:,1)+floor(rows/2)];
 %% Reshape again to get the matrical form back
 %reput in matricial form
 class_matrix = reshape(class_column,rows,cols);
