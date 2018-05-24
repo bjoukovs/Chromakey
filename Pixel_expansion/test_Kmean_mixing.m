@@ -1,6 +1,6 @@
 clear; close all;clc;
 
-SPILLING_COEFF = 2; %The higher, the less the spilling is removed
+SPILLING_COEFF = 1.8; %The higher, the less the spilling is removed
 
 
 %% Image conversion to L*a*b*
