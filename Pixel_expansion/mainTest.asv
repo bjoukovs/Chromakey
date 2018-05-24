@@ -1,0 +1,31 @@
+%% main
+clear; close all;clc;
+
+%% Image Loading
+image = imread('test3.jpg');
+% figure;imshow(image), title('Original image');
+[rows, cols, ~] = size(image);
+
+%% Scribbles information
+%Get scribble
+load('values_GUI.mat');
+custom_color_AB = scribblesInfo(scribbles)
+
+%% Segmention
+nb_classes = length(scribbles);
+segmented_images = Segmentation_Kmeans(image,rows,cols,custom_color_AB,nb_classes)
+
+for k = 1:nb_classes
+    %plots the different classes
+    figure; imshow(segmented_images{k});
+end
+
+%% Remove green spilling
+spillingCoefficient = 1.5;
+
+image_keyed = UnMixing(rows,cols,image_YUV)
+figure; imshow(image_keyed);
+
+%% Get the image uner an uniform shape
+
+
