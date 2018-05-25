@@ -392,6 +392,16 @@ function pushbutton8_Callback(hObject, eventdata, handles)
     % hObject    handle to pushbutton8 (see GCBO)
     % eventdata  reserved - to be defined in a future version of MATLAB
     % handles    structure with handles and user data (see GUIDATA)
+    global result_image;
+    global alpha_mask;
+%     [rows,cols,~]=size(result_image)
+%     result_alpha = zeros(rows,cols,4)
+%     result_alpha(:,:,1:3) = result_image;
+%     result_alpha(:,:,4) = alpha_mask;
+    
+    imwrite(result_image, 'output3.png', 'png', 'Alpha', alpha_mask);
+   
+    
 
 
 % --- Executes on slider movement.
@@ -472,6 +482,7 @@ function ResultButton_Callback(hObject, eventdata, handles)
     global scribble_means;
     global scribble_vars;
     global class_matrix;
+    global alpha_mask;
     
     if scribble_n ~= 0
         
@@ -479,7 +490,7 @@ function ResultButton_Callback(hObject, eventdata, handles)
         [custom_color_AB, image_YUV,image_double,scribble_means,scribble_vars] = scribblesInfo(main_image,scribbles,custom_color);
         
         % Compute image segments
-        [segmented_images,class_matrix] = Segmentation_Kmeans(main_image,scribbles,custom_color_AB,length(custom_color));
+        [segmented_images,class_matrix, alpha_mask] = Segmentation_Kmeans(main_image,scribbles,custom_color_AB,length(custom_color));
         
         %An output image is now available
         availableResult = 1;

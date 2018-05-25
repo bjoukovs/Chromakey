@@ -6,6 +6,8 @@ function showUnmixedImage(handles)
     global scribble_means;
     global scribble_vars;
     global background;
+    global alpha_mask;
+    global result_alpha;
     
     mode = get(handles.popupmenu1, 'Value');
     
@@ -33,11 +35,14 @@ function showUnmixedImage(handles)
     
     elseif mode == 3
         %show alpha mask
-        %TO COMPLETE
+        figure(10)
+        imshow(alpha_mask);
+        return
     end
     
     
     figure(10);
     imshow(result_image);
+    
         
 end

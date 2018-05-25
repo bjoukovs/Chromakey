@@ -1,8 +1,23 @@
 function [segmented_images,class_matrix, alpha_map] = Segmentation_Kmeans(image,scribbles,custom_color_AB,nb_classes)
-    
+    global background;
+
     addpath('..');
     
     [rows,cols, ~] = size(image);
+    
+%     HSIZE = [101 101];
+%     SIGMA = 1.5;
+%     H = fspecial('gaussian',HSIZE,SIGMA);
+%     imA = image(:,:,1);
+%     im_filA = conv2(imA,H,'same');
+%     imB = image(:,:,2);
+%     im_filB = conv2(imB,H,'same');
+%     imC = image(:,:,3);
+%     im_filC = conv2(imC,H,'same');
+%     
+%     image(:,:,1) = im_filA;
+%     image(:,:,2) = im_filB;
+%     image(:,:,3) = im_filC;
     
 
     %% Conversion to LAB space
@@ -17,17 +32,6 @@ function [segmented_images,class_matrix, alpha_map] = Segmentation_Kmeans(image,
     %% Applying the K-means clustering method
     %keep the a and b component of Lab space
     im_AB = im_LAB(:,:,2:3);
-
-    HSIZE = [3 3];
-    SIGMA = 1.5;
-    H = fspecial('gaussian',HSIZE,SIGMA)
-    imA = im_AB(:,:,1);
-    im_filA = conv2(imA,H,'same');
-    imB = im_AB(:,:,2);
-    im_filB = conv2(imB,H,'same');
-    
-    im_AB(:,:,1) = im_filA;
-    im_AB(:,:,2) = im_filB;
     
     %reshape the obtained matrix (rowsxcolsx2) to get a 2columns matrix
     %(rows*colsx2). Need because the function kmeans needs such a input.
@@ -67,7 +71,7 @@ function [segmented_images,class_matrix, alpha_map] = Segmentation_Kmeans(image,
     %each RGB channel
     rgb_label = repmat(class_matrix,[1 1 3]);
 
-    alpha_map=ones(rows,col);
+    alpha_map=zeros(rows,cols);
     %go througth the different classes
     for k = 1:nb_classes
         %color = image;
@@ -81,7 +85,7 @@ function [segmented_images,class_matrix, alpha_map] = Segmentation_Kmeans(image,
         figure;imshow(segmented_images{k})
         
         if background{k}==1
-            alpha_map(class_matrix ~= k) = 0;  
+            alpha_map(class_matrix ~= k) = 1;  
         end
             
     end
