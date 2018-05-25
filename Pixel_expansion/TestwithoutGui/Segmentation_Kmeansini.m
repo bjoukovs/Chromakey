@@ -1,15 +1,10 @@
-function [segmented_images,class_matrix] = Segmentation_Kmeans(image,scribbles,custom_color_AB,nb_classes)
-    
-    addpath('..');
-    
-    [rows,cols, ~] = size(image);
+function [segmented_images,class_matrix] = Segmentation_Kmeans(image,rows,cols,custom_color_AB,nb_classes)
+
 
     %% Conversion to LAB space
     %Transform the RGB image into a new kind of color space, the LAB one, where
     %the L component represent the luminosity (don't use it here) and A and B
     %represent the two different color information used
-    
-    %im_LAB = rgb2lab(image);
     im_LAB = rgb2lab(image);
 
     %% Applying the K-means clustering method
@@ -18,12 +13,14 @@ function [segmented_images,class_matrix] = Segmentation_Kmeans(image,scribbles,c
 
     %reshape the obtained matrix (rowsxcolsx2) to get a 2columns matrix
     %(rows*colsx2). Need because the function kmeans needs such a input.
-    
     im_AB_col = reshape(im_AB,rows*cols,2);
-    
     %reshape column wise: put each column of the matrix below the previous one,
     %and each element contains 2 components (a and b), here they are put one
     %aside each other (that is why there are 2 columns in the matrix)
+
+    %Specify the number of cathegories that we want (number on differents
+    %zones/centroïdes/classes used in the algorithm
+    nb_classes = nb_classes;
 
     %A very important thing is to avoid begining with centroid in local minima
     %(his is due to the randomness initialization...) because in this case the
@@ -46,7 +43,7 @@ function [segmented_images,class_matrix] = Segmentation_Kmeans(image,scribbles,c
     %reput in matricial form
     class_matrix = reshape(class_column,rows,cols);
     %plot the categories as grey levels
-    %imshow(class_matrix,[]), title('Image segmented with a gray level for each of the classes');
+    imshow(class_matrix,[]), title('Image segmented with a gray level for each of the classes');
 
     %% Attribute colors from the true image to the categories
     segmented_images = cell(1,nb_classes);
@@ -56,14 +53,12 @@ function [segmented_images,class_matrix] = Segmentation_Kmeans(image,scribbles,c
 
     %go througth the different classes
     for k = 1:nb_classes
-        %color = image;
         color = image;
         color(rgb_label ~= k) = 0; %put the pixels of the image copy ('color') to 0 if their category label
                                    %is different from the kth label that is
                                    %tested in the loop. The test is performed
                                    %on the 3 channels (R,G,B) at the same time 
         segmented_images{k} = color; %there is only the color of the category remaining
-        figure;imshow(segmented_images{k})
     end
 
 end

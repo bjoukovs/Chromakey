@@ -1,9 +1,13 @@
+<<<<<<< HEAD:Pixel_expansion/TestwithoutGui/UnMixing.m
+function output = UnMixing(rows,cols,image_YUV,image_double,spillingCoefficient,nb_classes,class_matrix,scribble_means,scribble_vars)
+=======
 function output = UnMixing(image_double,spillingCoefficient,nb_classes,class_matrix,scribble_means,scribble_vars,backgrounds, luminanceCorrection,corrections)
 
 
     [rows,cols, ~] = size(image_double);
     
     image_YUV = rgb2yuv(image_double);
+>>>>>>> origin/master:Pixel_expansion/UnMixing.asv
 
     %% VAR AND MEAN OF THE TRUE 
     vec_image = reshape(image_YUV, [], 1, size(image_double,3));
@@ -18,14 +22,27 @@ function output = UnMixing(image_double,spillingCoefficient,nb_classes,class_mat
     end
 
     %% Pixel transformation
+<<<<<<< HEAD:Pixel_expansion/TestwithoutGui/UnMixing.m
+    for x=1:cols
+       for y=1:rows      
+           index = class_matrix(y,x);
+           image_YUV2(y,x,:) = scribble_means(index,1,:) + spillingCoefficient*scribble_vars(index, 1, :) .* ...
+               ((image_YUV(y,x,:) - original_means(index, 1, :))./ original_vars(index, 1, :));
+
+           if index == 1
+              image_YUV2(y,x,:) = [0 0 0]; %black in YUV
+              image_YUV(y,x,:) = [0 0 0]; %black in YUV
+           end       
+       end
+=======
     lumCor = zeros(1,1,3);
     lumCor(1,1,1) = luminanceCorrection;
     
     class_matrix_vec = reshape(class_matrix, rows*cols,1);
     original_mean_matrix = zeros(rows*cols,1,3);
-    original_var_matrix = ones(rows*cols,1,3);
+    original_var_matrix = zeros(rows*cols,1,3);
     scribble_mean_matrix = zeros(rows*cols,1,3);
-    scribble_var_matrix = ones(rows*cols,1,3);
+    scribble_var_matrix = zeros(rows*cols,1,3);
     
     for i=1:nColors
         positions = find(class_matrix_vec==i);
@@ -38,11 +55,11 @@ function output = UnMixing(image_double,spillingCoefficient,nb_classes,class_mat
         else
             if corrections==1
                 scribble_mean_matrix(positions,1,2:3) = ones(length(positions),1,2).*scribble_means(i, 1,2:3);
-                scribble_mean_matrix(positions,1,1) = luminanceCorrection*ones(length(positions),1,1);
+                scri
                 
-                scribble_var_matrix(positions,1,2:3) = spillingCoefficient*ones(length(positions),1,2).*scribble_vars(i, 1,2:3);
-                original_mean_matrix(positions,1,2:3) = ones(length(positions),1,2).*original_means(i, 1,2:3);
-                original_var_matrix(positions,1,2:3) = ones(length(positions),1,2).*original_vars(i, 1,2:3);
+                scribble_var_matrix(positions,1,:) = spillingCoefficient*ones(length(positions),1,3).*scribble_vars(i, 1,:);
+                original_mean_matrix(positions,1,:) = ones(length(positions),1,3).*original_means(i, 1,:);
+                original_var_matrix(positions,1,:) = ones(length(positions),1,3).*original_vars(i, 1,:);
             else
                 scribble_mean_matrix(positions,1,:) = zeros(length(positions),1,3);
                 scribble_var_matrix(positions,1,:) = ones(length(positions),1,3);
@@ -50,6 +67,7 @@ function output = UnMixing(image_double,spillingCoefficient,nb_classes,class_mat
                 original_var_matrix(positions,1,:) = ones(length(positions),1,3);
             end
         end
+>>>>>>> origin/master:Pixel_expansion/UnMixing.asv
     end
     
     image_YUV2_vec = reshape(image_YUV,rows*cols,1,3);

@@ -37,7 +37,7 @@ function showUnmixedImage(handles)
     end
     
     
-    figure(2);
+    figure(10);
     imshow(result_image);
         
 end
