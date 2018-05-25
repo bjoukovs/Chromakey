@@ -1,21 +1,34 @@
-function [segmented_images,class_matrix] = Segmentation_Kmeans(image,scribbles,custom_color_AB,nb_classes)
+function [segmented_images,class_matrix, alpha_map] = Segmentation_Kmeans(image,scribbles,custom_color_AB,nb_classes)
     
     addpath('..');
     
     [rows,cols, ~] = size(image);
+    
 
     %% Conversion to LAB space
     %Transform the RGB image into a new kind of color space, the LAB one, where
     %the L component represent the luminosity (don't use it here) and A and B
     %represent the two different color information used
     
-    %im_LAB = rgb2lab(image);
     im_LAB = rgb2lab(image);
 
+
+    
     %% Applying the K-means clustering method
     %keep the a and b component of Lab space
     im_AB = im_LAB(:,:,2:3);
 
+    HSIZE = [3 3];
+    SIGMA = 1.5;
+    H = fspecial('gaussian',HSIZE,SIGMA)
+    imA = im_AB(:,:,1);
+    im_filA = conv2(imA,H,'same');
+    imB = im_AB(:,:,2);
+    im_filB = conv2(imB,H,'same');
+    
+    im_AB(:,:,1) = im_filA;
+    im_AB(:,:,2) = im_filB;
+    
     %reshape the obtained matrix (rowsxcolsx2) to get a 2columns matrix
     %(rows*colsx2). Need because the function kmeans needs such a input.
     
@@ -54,16 +67,23 @@ function [segmented_images,class_matrix] = Segmentation_Kmeans(image,scribbles,c
     %each RGB channel
     rgb_label = repmat(class_matrix,[1 1 3]);
 
+    alpha_map=ones(rows,col);
     %go througth the different classes
     for k = 1:nb_classes
         %color = image;
         color = image;
+        %color_save=color;
         color(rgb_label ~= k) = 0; %put the pixels of the image copy ('color') to 0 if their category label
                                    %is different from the kth label that is
                                    %tested in the loop. The test is performed
                                    %on the 3 channels (R,G,B) at the same time 
         segmented_images{k} = color; %there is only the color of the category remaining
         figure;imshow(segmented_images{k})
+        
+        if background{k}==1
+            alpha_map(class_matrix ~= k) = 0;  
+        end
+            
     end
 
 end
