@@ -1,11 +1,11 @@
-function updateImageAndScribbles(handles)
+function updateImageAndScribbles(handles, btndownfunction)
     global main_image
     global scribbles
     
     clearAxes(handles.axes1);
     axes(handles.axes1);
     img = imshow(main_image, 'parent', handles.axes1);
-    set(img,'ButtonDownFcn',@image_ButtonDownFcn);
+    set(img,'ButtonDownFcn',btndownfunction);
     hold on;
     
     for i=1:length(scribbles)

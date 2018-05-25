@@ -198,7 +198,7 @@ function pushbutton4_Callback(hObject, eventdata, handles)
         custom_color(old_num) = [];
         
         updateScribbleInfo(handles);
-        updateImageAndScribbles(handles);
+        updateImageAndScribbles(handles, @image_ButtonDownFcn);
         
         
     end
