@@ -23,7 +23,7 @@ function varargout = GUI(varargin)
 
     % Edit the above text to modify the response to help GUI
 
-    % Last Modified by GUIDE v2.5 24-May-2018 23:04:10
+    % Last Modified by GUIDE v2.5 26-May-2018 17:07:33
 
     % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -147,8 +147,8 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 
 % --- Executes on button press in pushbutton3.
 function pushbutton3_Callback(hObject, eventdata, handles)
-    %[filename, filepath] = uigetfile({'.';'.jpg';'.tif';'.png';'.bmp'},'Search image to be displayed');
-    [filename, filepath] = uigetfile({'.jpg'},'Search image to be displayed');
+    [filename, filepath] = uigetfile({'*.jpg';'*.tif';'*.png';'*.bmp'},'Search image to be displayed');
+    %[filename, filepath] = uigetfile({'.jpg'},'Search image to be displayed');
     filename= [filepath filename];
     imageFile = im2double(imread(filename));
 
@@ -165,6 +165,11 @@ function pushbutton3_Callback(hObject, eventdata, handles)
     axes(handles.axes1)
     img = imshow(imageFile, 'parent', handles.axes1);
     set(img,'ButtonDownFcn',@image_ButtonDownFcn);
+    
+    set(handles.pushbutton3, 'Enable', 'off');
+    set(handles.pushbutton11, 'Enable', 'on');
+    set(handles.ResultButton, 'Enable', 'on');
+    set(handles.pushbutton8, 'Enable', 'on');
 
 
 % --- Executes on button press in pushbutton4.
@@ -398,8 +403,11 @@ function pushbutton8_Callback(hObject, eventdata, handles)
 %     result_alpha = zeros(rows,cols,4)
 %     result_alpha(:,:,1:3) = result_image;
 %     result_alpha(:,:,4) = alpha_mask;
+
+    [export_file, export_path] = uiputfile('*.png', 'Save as...');
+    export_name = [export_path export_file];
     
-    imwrite(result_image, 'output3.png', 'png', 'Alpha', alpha_mask);
+    imwrite(result_image, export_name, 'png', 'Alpha', alpha_mask);
    
     
 
@@ -501,3 +509,21 @@ function ResultButton_Callback(hObject, eventdata, handles)
     
     
     
+
+
+% --- Executes on button press in pushbutton11.
+function pushbutton11_Callback(hObject, eventdata, handles)
+    [filename, filepath] = uigetfile({'*.jpg';'*.tif';'*.png';'*.bmp'},'Browse background image');
+    filename= [filepath filename];
+    imageFile = im2double(imread(filename));
+    
+    [export_file, export_path] = uiputfile('*.png', 'Save as...');
+    export_name = [export_path export_file];
+    
+    global result_image;
+    global alpha_mask;
+    
+    output = superpose(imageFile, result_image, alpha_mask);
+    
+    imwrite(output, export_name, 'png');
+

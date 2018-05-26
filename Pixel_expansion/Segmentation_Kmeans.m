@@ -85,7 +85,7 @@ function [segmented_images,class_matrix, alpha_map] = Segmentation_Kmeans(image,
                                    %tested in the loop. The test is performed
                                    %on the 3 channels (R,G,B) at the same time 
         segmented_images{k} = color; %there is only the color of the category remaining
-        figure;imshow(segmented_images{k})
+        %figure;imshow(segmented_images{k})
         
         if background{k}==1
             alpha_map(class_matrix ~= k) = 1;  
