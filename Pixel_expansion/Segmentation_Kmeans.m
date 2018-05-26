@@ -1,4 +1,7 @@
 function [segmented_images,class_matrix, alpha_map] = Segmentation_Kmeans(image,scribbles,custom_color_AB,nb_classes)
+    % Inspired from Matlab tutorial, "Color-Based Segmentation Using K-Means Clustering"
+    % https://nl.mathworks.com/help/images/examples/color-based-segmentation-using-k-means-clustering.html
+
     global background;
 
     addpath('..');
