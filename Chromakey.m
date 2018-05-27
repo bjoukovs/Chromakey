@@ -9,6 +9,7 @@ global scribbles;
 global scribble_n;
 global background;
 global availableResult;
+global custom_color;
 
 mouseDown = 0;
 scribble_n = 0;

@@ -1,5 +1,4 @@
-function output = UnMixing(image_double,spillingCoefficient,nb_classes,class_matrix,scribble_means,scribble_vars,backgrounds, luminanceCorrection,corrections)
-
+function output = UnMixing(image_double,spillingCoefficient,nb_classes,class_matrix,scribble_means,scribble_vars,backgrounds, luminanceCorrection,corrections,colorRegions)
 
     [rows,cols, ~] = size(image_double);
     
@@ -41,7 +40,9 @@ function output = UnMixing(image_double,spillingCoefficient,nb_classes,class_mat
                 scribble_mean_matrix(positions,1,1) = luminanceCorrection*ones(length(positions),1,1);
                 
                 scribble_var_matrix(positions,1,2:3) = spillingCoefficient*ones(length(positions),1,2).*scribble_vars(i, 1,2:3);
+                
                 original_mean_matrix(positions,1,2:3) = ones(length(positions),1,2).*original_means(i, 1,2:3);
+                
                 original_var_matrix(positions,1,2:3) = ones(length(positions),1,2).*original_vars(i, 1,2:3);
             else
                 scribble_mean_matrix(positions,1,:) = zeros(length(positions),1,3);
@@ -49,6 +50,11 @@ function output = UnMixing(image_double,spillingCoefficient,nb_classes,class_mat
                 original_mean_matrix(positions,1,:) = zeros(length(positions),1,3);
                 original_var_matrix(positions,1,:) = ones(length(positions),1,3);
             end
+        end
+        
+         if colorRegions == 1
+           scribble_var_matrix(positions,1,1) = zeros(length(positions),1,1);
+           scribble_mean_matrix(positions,1,1) = scribble_means(i,1,1).*ones(length(positions),1,1);
         end
     end
     

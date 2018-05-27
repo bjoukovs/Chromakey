@@ -256,8 +256,11 @@ function pushbutton6_Callback(hObject, eventdata, handles)
       color = cp.getValue.getColorComponents([])';   % an [R,G,B] array of values
       % Do something with the color
       
+      color_2 = zeros(1,1,3);
+      color_2(1,1,:) = [color(1) color(2) color(3)];
+      
       if scribble_n ~= 0
-         custom_color{scribble_n} = color; 
+         custom_color{scribble_n} = color_2; 
       end
       
       
